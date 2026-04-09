@@ -7,11 +7,17 @@ export function CustomCursor() {
   const ringRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    const canUseCustomCursor = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+    if (!canUseCustomCursor) return;
+
     const dot = dotRef.current;
     const ring = ringRef.current;
     if (!dot || !ring) return;
 
     let ringX = 0, ringY = 0, mouseX = 0, mouseY = 0;
+    const hoverEls = document.querySelectorAll('a, button, [data-cursor]');
+    const onEnter = () => document.body.classList.add('cursor-hover');
+    const onLeave = () => document.body.classList.remove('cursor-hover');
 
     const onMove = (e: MouseEvent) => {
       mouseX = e.clientX;
@@ -27,16 +33,24 @@ export function CustomCursor() {
 
     window.addEventListener('mousemove', onMove);
     gsap.ticker.add(tick);
+    document.body.classList.add('custom-cursor-active');
+    document.body.style.cursor = 'none';
 
-    const hoverEls = document.querySelectorAll('a, button, [data-cursor]');
     hoverEls.forEach(el => {
-      el.addEventListener('mouseenter', () => document.body.classList.add('cursor-hover'));
-      el.addEventListener('mouseleave', () => document.body.classList.remove('cursor-hover'));
+      el.addEventListener('mouseenter', onEnter);
+      el.addEventListener('mouseleave', onLeave);
     });
 
     return () => {
       window.removeEventListener('mousemove', onMove);
       gsap.ticker.remove(tick);
+      document.body.classList.remove('custom-cursor-active');
+      document.body.classList.remove('cursor-hover');
+      document.body.style.cursor = '';
+      hoverEls.forEach(el => {
+        el.removeEventListener('mouseenter', onEnter);
+        el.removeEventListener('mouseleave', onLeave);
+      });
     };
   }, []);
 
