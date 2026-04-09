@@ -421,7 +421,14 @@ export default function WallCalendar() {
 
       <div className="w-full px-4 pb-4 md:px-8 md:pb-8">
         <div className="mx-auto w-full max-w-6xl mt-5 md:mt-6">
-          <div className="w-full md:rounded-2xl rounded-xl shadow-[0_18px_55px_rgba(0,0,0,0.08)] overflow-hidden flex flex-col md:flex-row relative border" style={{ borderColor: 'var(--panel-border)', backgroundColor: 'var(--panel-bg)' }}>
+          <div className="relative pt-5 sm:-pt-10 md:pt-15">
+            <img
+              src="/spiral_transparent.png"
+              alt="Calendar spiral binding"
+              className="hidden lg:block pointer-events-none select-none absolute left-1/2 -top-27 z-20 h-auto w-[90%] -translate-x-1/2"
+            />
+
+            <div className="w-full md:rounded-2xl rounded-xl shadow-[0_18px_55px_rgba(0,0,0,0.08)] overflow-hidden flex flex-col md:flex-row relative border" style={{ borderColor: 'var(--panel-border)', backgroundColor: 'var(--panel-bg)' }}>
           <div className="w-full md:w-5/12 lg:w-1/2 relative overflow-hidden h-[42vh] sm:h-[48vh] md:h-auto md:min-h-[80vh] border-b md:border-b-0 md:border-r" style={{ borderColor: 'var(--panel-border)', backgroundColor: '#ffffff' }}>
             <ImageHero displayDate={displayDate} imgAnimKey={imgAnimKey} />
           </div>
@@ -464,6 +471,7 @@ export default function WallCalendar() {
             </div>
           </div>
         </div>
+          </div>
       </div>
       </div>
     </section>
