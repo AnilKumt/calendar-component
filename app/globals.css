@@ -1,8 +1,49 @@
 @import "tailwindcss";
 
 :root {
+  /* Light mode colors */
   --background: #ffffff;
-  --foreground: #171717;
+  --foreground: #202124;
+  --accent: #0667F9;
+  --accent-rgb: 6 103 249;
+  --bg: #fff;
+  --dock: white;
+  --bg-image: none;
+
+  /* Theme palette colors (default warm-beige) */
+  --theme-primary: #F6BD60;
+  --theme-light: #F7EDE2;
+  --theme-accent: #F5CAC3;
+  --theme-secondary: #84A59D;
+  --theme-highlight: #F28482;
+  --theme-surface: #f7ede2;
+
+  --panel-bg: #ffffff;
+  --panel-border: #e5e7eb;
+  --text-primary: #202124;
+  --text-secondary: #5f6368;
+  --surface-muted: #f7f7f7;
+  --divider-color: #000000;
+}
+
+html[data-theme="dark"],
+html.dark,
+html.dark-mode {
+  --background: #0f1115;
+  --foreground: #f3f4f6;
+  --accent: #5f9ff6;
+  --accent-rgb: 95 159 246;
+  --bg: #0f1115;
+  --dock: #171a21;
+  --bg-image: none;
+
+  --panel-bg: #171a21;
+  --panel-border: #2b3140;
+  --text-primary: #f3f4f6;
+  --text-secondary: #aab2c0;
+  --surface-muted: #1e2430;
+  --theme-surface: #232a39;
+  --divider-color: #ffffff;
 }
 
 @theme inline {
@@ -12,15 +53,368 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: "Google Sans", Arial, Helvetica, sans-serif;
+}
+
+.calendar-perspective {
+  perspective: 2000px;
+}
+
+.calendar-card {
+  transform-origin: top center;
+}
+
+/* Dock & Paper Styles */
+.dock-wrapper {
+  --w: 300px;
+  --h: 120px;
+  --br: 24px;
+  width: var(--w);
+  height: var(--h);
+  max-width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  pointer-events: none;
+}
+
+.dock-wrapper-inline {
+  --w: 300px;
+  --h: 120px;
+  --br: 24px;
+  width: var(--w);
+  height: var(--h);
+  max-width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  pointer-events: none;
+  position: relative;
+}
+
+.dock-clip {
+  --pd: 10000px;
+  --pd-n: -10000px;
+  overflow: clip;
+  padding: var(--pd) var(--pd) 0;
+  margin: var(--pd-n) var(--pd-n) 0;
+  pointer-events: none;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  flex-shrink: 0;
+  border-radius: var(--br);
+}
+
+.dock {
+  border: 1px solid #cccccc50;
+  border-radius: inherit;
+  background: var(--dock);
+  position: relative;
+  height: var(--h);
+  width: var(--w);
+  display: flex;
+  justify-content: center;
+  pointer-events: auto;
+}
+
+.dock .paper-wrapper {
+  position: absolute;
+  margin-top: 20px;
+  margin-left: 50px;
+  transform-origin: 0% 100%;
+  transition: all 0.4s ease;
+}
+
+.dock .paper-wrapper:nth-child(3) {
+  transform: rotate(-15deg) translateY(30px) translateX(-10px);
+}
+
+.dock .paper-wrapper:nth-child(2) {
+  transform: rotate(-25deg) translateY(45px) translateX(-30px);
+}
+
+.dock .paper-wrapper:nth-child(1) {
+  transform: rotate(-35deg) translateY(85px) translateX(-50px);
+}
+
+.dock .paper-wrapper:nth-child(4) {
+  cursor: grab;
+  transform: translateX(var(--x)) translateY(var(--y));
+}
+
+.dock .paper-wrapper:nth-child(4):hover {
+  margin-top: 10px;
+}
+
+.dock:not(.dragging) .paper-wrapper {
+  transition: none;
+}
+
+.dock.dragging .paper-wrapper {
+  transition: none;
+}
+
+.dock.dragging .paper-wrapper:nth-child(4) {
+  cursor: grabbing;
+}
+
+.dock.dragging.out .paper-wrapper:nth-child(3) {
+  transform: rotate(0deg) translateY(0px) translateX(0px);
+}
+
+.dock.dragging.out .paper-wrapper:nth-child(2) {
+  transform: rotate(-15deg) translateY(30px) translateX(-10px);
+}
+
+.dock.dragging.out .paper-wrapper:nth-child(1) {
+  transform: rotate(-25deg) translateY(45px) translateX(-30px);
+}
+
+.dock:not(.out) .paper-wrapper:nth-child(4) {
+  transition: all 0.4s ease;
+}
+
+.dock.dragging .paper-wrapper:nth-child(4) {
+  transition: none;
+}
+
+.dock.out .paper-wrapper:nth-child(4) {
+  transition: none;
+}
+
+.canvas {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  pointer-events: none;
+}
+
+.canvas .graphic {
+  position: absolute;
+}
+
+@keyframes flipForward {
+  0%   { transform: rotateX(0deg); opacity: 1; }
+  45%  { transform: rotateX(-90deg) scaleY(0.95); opacity: 0.3; }
+  55%  { transform: rotateX(90deg) scaleY(0.95); opacity: 0.3; }
+  100% { transform: rotateX(0deg); opacity: 1; }
+}
+
+@keyframes flipBackward {
+  0%   { transform: rotateX(0deg); opacity: 1; }
+  45%  { transform: rotateX(90deg) scaleY(0.95); opacity: 0.3; }
+  55%  { transform: rotateX(-90deg) scaleY(0.95); opacity: 0.3; }
+  100% { transform: rotateX(0deg); opacity: 1; }
+}
+
+.flip-forward {
+  animation: flipForward 0.42s ease both;
+}
+
+.flip-backward {
+  animation: flipBackward 0.42s ease both;
+}
+
+@keyframes cellPop {
+  0%   { opacity: 0; transform: scale(0.4); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+.day-cell {
+  animation: cellPop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+@keyframes kenburns {
+  0%   { transform: scale(1) translate(0, 0); }
+  100% { transform: scale(1.02) translate(-0.4%, -0.4%); }
+}
+
+@keyframes imgFadeIn {
+  0%   { opacity: 0; transform: scale(1.04) translate(1%, 0); }
+  100% { opacity: 1; }
+}
+
+.cal-img {
+  animation: kenburns 10s ease-in-out infinite alternate;
+}
+
+.img-fade-in {
+  animation: imgFadeIn 0.6s ease forwards, kenburns 14s ease-in-out infinite alternate;
+}
+
+.range-tooltip {
+  border: 1px solid var(--theme-primary);
+  background: var(--panel-bg);
+  color: var(--text-primary);
+  border-radius: 10px;
+  padding: 8px 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.nav-btn {
+  transition: all 0.18s;
+  border-radius: 50%;
+}
+
+.nav-btn:hover {
+  background: var(--theme-surface);
+  color: var(--theme-primary);
+  transform: scale(1.08);
+}
+
+.nav-btn:active {
+  transform: scale(0.95);
+}
+
+.notes-body {
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: max-height 0.32s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.24s;
+}
+
+.notes-body.open {
+  max-height: 460px;
+  opacity: 1;
+}
+
+.notes-caret {
+  transition: transform 0.24s;
+}
+
+.notes-caret.open {
+  transform: rotate(180deg);
+}
+
+.day-cell:hover {
+  transform: scale(1.08);
+  background: var(--theme-light);
+  z-index: 2;
+  transition: all 0.16s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.header-divider {
+  color: var(--divider-color);
+}
+
+.avatars {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.avatar-link {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+  position: relative;
+  z-index: 10;
+}
+
+.avatar-link:visited,
+.avatar-link:active,
+.avatar-link:focus {
+  text-decoration: none;
+  color: inherit;
+}
+
+.avatar {
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  background: var(--panel-bg);
+  border: 2px solid var(--panel-border);
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  overflow: hidden;
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.avatar:hover {
+  transform: translateY(-2px) scale(1.03);
+  border-color: var(--panel-border);
+}
+
+.avatar-image {
+  width: 80%;
+  height: 80%;
+  object-fit: contain;
+  pointer-events: none;
+}
+
+@media (max-width: 640px) {
+  .avatar {
+    width: 50px;
+    height: 50px;
+  }
+}
+
+html[data-theme="dark"] .day-cell:hover span,
+html.dark .day-cell:hover span,
+html.dark-mode .day-cell:hover span {
+  color: #111111 !important;
+}
+
+/* Custom Cursor Styles */
+.cursor-dot {
+  position: fixed;
+  width: 8px;
+  height: 8px;
+  background: white;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9999;
+  left: 0;
+  top: 0;
+  margin: -4px 0 0 -4px;
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.3);
+  mix-blend-mode: lighten;
+}
+
+html.dark-mode .cursor-dot,
+html[data-theme="dark"] .cursor-dot {
+  background: #333333;
+  box-shadow: 0 0 4px rgba(255, 255, 255, 0.3);
+  mix-blend-mode: darken;
+}
+
+.cursor-ring {
+  position: fixed;
+  width: 32px;
+  height: 32px;
+  border: 2px solid white;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9998;
+  left: 0;
+  top: 0;
+  margin: -16px 0 0 -16px;
+  mix-blend-mode: lighten;
+}
+
+html.dark-mode .cursor-ring,
+html[data-theme="dark"] .cursor-ring {
+  border-color: #404040;
+  mix-blend-mode: screen;
+}
+
+body.cursor-hover .cursor-dot {
+  width: 6px;
+  height: 6px;
+  margin: -3px 0 0 -3px;
+  background: white;
+}
+
+body.cursor-hover .cursor-ring {
+  border-color: white;
+  border-width: 3px;
+  transform: scale(1.5);
 }
